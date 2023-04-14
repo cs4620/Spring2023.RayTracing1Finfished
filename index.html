@@ -8,7 +8,14 @@
 <body>
   <canvas id="canvas"></canvas>
   <script>
+
+    /**
+     * Pixel class that store the r,g,and b values of a pixel
+     */
     class Pixel {
+      /**
+       * Constructor for the pixel class
+       */
       constructor(r = 0, g = 0, b = 0) {
         this.r = r;
         this.g = g;
@@ -16,7 +23,14 @@
       }
     }
 
+    /**
+     * An image class to store pixel
+     * These pixels can then be sent to an image
+     */
     class Image {
+      /**
+       * Create an image with the given width and height
+       */
       constructor(width, height) {
         this.width = width;
         this.height = height;
@@ -29,72 +43,106 @@
           }
         }
       }
+      /**
+       * Set an individual pixel
+       * @param {Number} x - The x coordinate of the pixel to set.
+       * @param {Number} y - The y coordinate of the pixel to set.
+       * @param {Pixel} pixel - The r,g,and b value to set.
+       */
       setPixel(x, y, pixel) {
         this.pixelData[x][y] = pixel;
       }
+      /**
+       * Get the r,b,and b values at a given (x,y) location.
+       * @param {Number} x - The x coordinate of the pixel to get.
+       * @param {Number} y - The y coordinate of the pixel to get.
+       */
       getPixel(x, y) {
         return this.pixelData[x][y];
       }
     }
 
+    /**
+     * A class that explains a sphere parametrically
+     */
     class Sphere {
+      /**
+       * Create a sphere with the given center coordinate
+       * and radius.
+       * @param {Vector3} center The center of the sphere
+       * @param {Number} radius - The radius of the sphere.
+       * */
       constructor(center, radius) {
         this.center = center;
         this.radius = radius;
       }
+      /**
+       * Calculate the intersection point between a ray and
+       * this sphere.
+       * @param {Vector3} o - The origin of the ray in question.
+       * @param {Vector3} d - The direction of the ray in question.
+       * @returns undefined if there are no real roots or both roots are 
+       * behind the ray origin. The coordinate of the closest collision point otherwise.
+       * */
       intersect(o, d) {
         let c = this.center;
         let r = this.radius;
 
-
-        // let A = d.x ** 2 + d.y ** 2 + d.y ** 2
-        // let B = 2 * d.x * (o.x - c.x)
-        //   + 2 * d.y * (o.y - c.y)
-        //   + 2 * d.z * (o.x - c.z)
-        // let C = o.x ** 2 + o.y ** 2 + o.z ** 2 + c.x ** 2 + c.y ** 2 + c.z ** 2
-        //   - r ** 2
-        //   - 2 * (o.x ** 2 * c.x ** 2) - 2 * o.y ** 2 * c.y ** 2 - 2 * o.z ** 2 * c.z ** 2
 
         let A = 1;
         let B = 2 * o.dot(d);
         let C = o.dot(o) - r ** 2;
 
         let discriminant = B ** 2 - 4 * A * C;
-        //let alt = 4*(o.dot(d)**2-o.dot(o)**2+r**2);
+        
         if (discriminant <= 0) {
           return undefined;
         }
         let sqrt = Math.sqrt(discriminant);
         let t1 = (-B - sqrt) / (2 * A)
         let t2 = (-B + sqrt) / (2 * A)
-        let t2a = -o.dot(d)+r;
-        let t1a = -o.dot(d)-r;
-        // t1=t1a;
-        // t2=t2a;
-
+        
         let t;
 
+        //If both collision points are positive, choose the closest one
         if (t1 > 0 && t2 > 0) {
           t = Math.min(t1, t2);
         }
+        //Both collision points were not infront of the ray.
         else {
+          //Check if t1 is positive
           if (t1 > 0)
             t = t1;
-          else
+          //Check if t2 is positive
+          else if(t2 > 0)
             t = t2;
+          //They are both behind the ray origin
+          else
+            return undefined; //The only collision points were behind the origin of the ray
         }
 
         return new Vector3(o.x + t * d.x, o.y + t * d.y, o.z + t * d.z);
       }
     }
 
+    /**
+     * A class for storing x,y,and z values
+     * */
     class Vector3 {
+      /**
+       * Create a new Vector3.
+       * Any parameters not supplied default to 0
+       * */
       constructor(x = 0, y = 0, z = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
         Object.freeze(this);
       }
+      /**
+       * Create a new Vector3 of length 1
+       * @returns {Vector3} A new Vector3 of length 1.
+       * */
       normalize() {
         let length = this.length()
         return new Vector3(this.x / length, this.y / length, this.z / length);
